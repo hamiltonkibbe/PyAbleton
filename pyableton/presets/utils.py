@@ -20,18 +20,40 @@
 #   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #   DEALINGS IN THE SOFTWARE.
 
-'''Utility functions for handling ableton presets
-'''
+"""Utilities functions for handling ableton presets
+"""
 
 import gzip
 import os
 from bs4 import BeautifulSoup
 
+class AbletonParameter(object):
+    """ A simple parameter wrapping class storing the XML element name, min/max values, and
+    semantic data for enum parameters
+    """
+    def __init__(self, name=None, type=None,min=None,max=None,dict=None):
+        self.name = name
+        self.type = type
+        self.min = min
+        self.max = max
+        self.dict = dict
+        
+        # Automatically calculate min and max for enum parameters
+        if self.dict is not None:
+            self.min = self.min if self.min is not None else min(self.dict.itervalues())
+            self.max = self.max if self.max is not None else max(self.dict.itervalues())
 
+    # Allow dict-style semantics
+    def __getitem__(self, key):
+        return self.__dict__[key]
+        
+    def __setitem__(self, key, value):
+        self.__dict__[key] = value
+        
 def preset2xml(filename, create_file=False):
-    ''' Convert an Ableton Preset to xml format. if `create_file` is True,
+    """ Convert an Ableton Preset to xml format. if `create_file` is True,
     write the xml data to filename.xml
-    '''
+    """
     with gzip.open(filename, 'rb') as f:
         xml = f.read()
         if create_file:
@@ -40,35 +62,33 @@ def preset2xml(filename, create_file=False):
     return xml
 
 def xml2preset(filename):
-    ''' Convert an Ableton Preset in xml format to an Ableton Preset file.
-    '''
+    """ Convert an Ableton Preset in xml format to an Ableton Preset file.
+    """
     with open(filename) as f:
         with gzip.open(os.path.splitext(filename)[0] + '.adv', 'wb') as out:
             out.writelines(f)
 
-
-
-#def parse_preset(xml):
-#    preset = BeautifulSoup(xml)
     
 
 def get_value(parameter, parent=None):
-    ''' parent should eventually be required....
+    """ parent should eventually be required....
     the single-parameter option is here until I can remove all the references
     to it. The 2 parameter version takes a parameter dict which stores the type
     and min/max values.
-    '''
+    """
     if parent is None:
         val = parameter.ArrangerAutomation.Events.contents[1]['Value']
         eventname = parameter.ArrangerAutomation.Events.contents[1].name
     else:
-        val = getattr(parent, parameter['name']).ArrangerAutomation.Events.contents[1]['Value']
-        eventname = getattr(parent, parameter['name']).ArrangerAutomation.Events.contents[1].name
+        val = getattr(parent, parameter.name).ArrangerAutomation.Events.contents[1]['Value']
+        eventname = getattr(parent, parameter.name).ArrangerAutomation.Events.contents[1].name
     if 'BoolEvent' in eventname:
         return (string2bool(val))
     elif 'EnumEvent' in eventname:
-        if parent is not None and parameter['type'] == 'enum':
-            for key, value in parameter['dict'].iteritems():
+        # Try to get the human-readable description from the dict, but fall
+        # back to returning just the int value
+        if parent is not None and parameter.type == 'enum':
+            for key, value in parameter.dict.iteritems():
                 if value == int(val):
                     return key
         else:
@@ -78,35 +98,35 @@ def get_value(parameter, parent=None):
 
 
 def set_value(parameter, value, parent=None):
-    ''' parent should eventually be required....
+    """ parent should eventually be required....
     the two-parameter option is here until I can remove all the references
     to it. The 3 parameter version takes a parameter dict which stores the type
     and min/max values, bounds checking should occur here, not outside calls to
     set_value.
-    '''
+    """
     if parent is None:
         parameter.ArrangerAutomation.Events.contents[1]['Value'] = value
     else:
-        if parameter['type'] is 'bool':
+        if parameter.type is 'bool':
             to_write = u'true' if value else u'false'
-        elif parameter['type'] is 'int':
+        elif parameter.type is 'int':
             to_write = u'%d' % clamp(value)
-        elif parameter['type'] is 'enum':
-            for key, val in parameter['dict'].iteritems():
+        elif parameter.type is 'float':
+            to_write = u'%f' % clamp(value)
+        elif parameter.type is 'enum':
+            for key, val in parameter.dict.iteritems():
                 if key == value.upper():
                     value = val
                     break
             to_write = u'%d' % value
-        elif parameter['type'] is 'float':
-            to_write = u'%f' % clamp(value)
-        getattr(parent,parameter['name']).ArrangerAutomation.Events.contents[1]['Value'] = to_write
+        getattr(parent,parameter.name).ArrangerAutomation.Events.contents[1]['Value'] = to_write
     
     
 def clamp(value, parameter):
-        ''' Clamp value to parameter's min and max values
-        '''
-        value = parameter['min'] if value < parameter['min'] else value
-        value = parameter['max'] if value > parameter['max'] else value
+        """ Clamp value to parameter's min and max values
+        """
+        value = parameter.min if value < parameter.min else value
+        value = parameter.max if value > parameter.max else value
         return value
     
 

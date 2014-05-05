@@ -21,7 +21,7 @@
 #   DEALINGS IN THE SOFTWARE.
 
 
-'''The setup and build script for the PyAbleton library.'''
+"""The setup and build script for the PyAbleton library."""
 
 __author__ = 'Hamilton Kibbe <ham@hamiltonkib.be>'
 __version__ = '1.0'
@@ -39,24 +39,24 @@ METADATA = {
     'author_email': 'ham@hamiltonkib.be',
     'description': 'A library for creating/editing Ableton Live presets',
     'license': 'MIT License'
-    }
+}
 
 SETUPTOOLS_METADATA = {
     'install_requires':['setuptools','bs4'],
     'include_package_data': True
-    }
+}
 
 def install():
-    ''' Install using setuptools, fallback to distutils
-    '''
+    """ Install using setuptools, fallback to distutils
+    """
     try:
         from setuptools import setup
         METADATA.update(SETUPTOOLS_METADATA)
         setup(**METADATA)
     except ImportError:
         from sys import stderr
-        stderr.write("Could not import setuptools, using distutils")
-        stderr.write("NOTE: You will need to install dependencies manualy")
+        stderr.write('Could not import setuptools, using distutils')
+        stderr.write('NOTE: You will need to install dependencies manualy')
         from distutils.core import setup
         setup(**METADATA)
 

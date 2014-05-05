@@ -20,22 +20,23 @@
 #   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #   DEALINGS IN THE SOFTWARE.
 
-'''instrument preset classes for Analog
-'''
+"""instrument preset classes for Analog
+"""
 
 
 from bs4 import BeautifulSoup
 from utils import preset2xml, get_value, set_value, string2bool
+from utils import AbletonParameter as Parameter
 import gzip
 import os
 
 
 class AnalogPreset(object):
-    ''' Analog preset class
+    """ Analog preset class
     This class stores the state of the preset in native ableton xml format.
     settings are implemented as properties and setting changes are written
     directly to the xml backing it. 
-    '''
+    """
     def __init__(self, filename=None):
         if filename is None:
             filename = os.path.join(os.path.dirname(__file__),'res/AnalogDefault.adv')
@@ -50,8 +51,8 @@ class AnalogPreset(object):
         
         
     def save_preset(self, filename=None):
-        ''' Save the AnalogPreset instance as an Ableton Live Analog preset file.
-        '''
+        """ Save the AnalogPreset instance as an Ableton Live Analog preset file.
+        """
         if filename is None:
             filename = self.filename
         with gzip.open(filename, 'wb') as out:
@@ -60,54 +61,51 @@ class AnalogPreset(object):
             
             
 class AnalogGlobals(object):
-    '''
-    '''
+    """ Global synthesizer settings
+    """
     # Map useful names to XML enumeration
     Poly = {'mono': 0, '2': 1, '4': 2,'8': 3, '12': 4, '16': 5, '20': 6,
             '24': 7, '28': 8, '32': 9 }
     
+    # Parameter Definitions
+    _polyphony = Parameter(name='Polyphony', type='enum', dict=AnalogGlobals.Poly)
+    _pitchbendrange = Parameter(name='PitchBendRange', type='float', min=0.0, max=1.0)
+    _volume = Parameter(name='Volume', type='float', min=0.0, max=1.0)
+    
+    
     def __init__(self, xmltree):
         self.parent = getattr(xmltree.Ableton, 'UltraAnalog')
-        
-        # Parameter Definitions
-        self._polyphony = {'name': 'Polyphony', 'type': 'enum',
-                           'min': AnalogGlobals.Poly['mono'],
-                           'max': AnalogGlobals.Poly['32'],
-                           'dict':AnalogGlobals.Poly}
-        self._pitchbendrange = {'name': 'PitchBendRange', 'type': 'float',
-                           'min': 0.0, 'max': 1.0}
-        self._volume = {'name': 'Volume', 'type': 'float', 'min': 0,
-                        'max': 1.0}
+
         
     @property
     def polyphony(self):
-        return get_value(self._polyphony, self.parent)
+        return get_value(AnalogGlobals._polyphony, self.parent)
     
     @polyphony.setter
     def polyphony(self, value):
-        set_value(self._polyphony, value, self.parent)
+        set_value(AnalogGlobals._polyphony, value, self.parent)
         
     @property
     def pitchbendrange(self):
-        return get_value(self._pitchbendrange, self.parent)
+        return get_value(AnalogGlobals._pitchbendrange, self.parent)
     
     @pitchbendrange.setter
     def pitchbendrange(self, value):
-        set_value(self._pitchbendrange, value, self.parent)
+        set_value(AnalogGlobals._pitchbendrange, value, self.parent)
 
     @property
     def volume(self):
-        return get_value(self._volume, self.parent)
+        return get_value(AnalogGlobals._volume, self.parent)
     
     @volume.setter
     def volume(self, value):
-        set_value(self._volume, value, self.parent)
+        set_value(AnalogGlobals._volume, value, self.parent)
      
 
 
 
 class Oscillator(object):
-    ''' Wrapper class for the Oscillators in an Ableton Analog preset.
+    """ Wrapper class for the Oscillators in an Ableton Analog preset.
     
 
     self.toggle         # Whether or not the oscillator is enabled {True False}
@@ -125,188 +123,159 @@ class Oscillator(object):
     self.level          # Level [0 1.0]
     self.lfomodpitch    # LFO Pitch Modulation Amount [0 1.0]
     self.lfomodpw       # LFO Pulse Width Modulation Amount [0 1.0]
-    '''
+    """
     # Map useful names to XML enumeration
     Waveforms = {'SINE': 0, 'SAW': 1, 'RECT': 2, 'NOISE': 3}
     Modes = {'SUB': 0, 'SYNC': 1}
     
+    # Parameter Definitions
+    _toggle = Parameter(name='OscillatorToggle', type='bool')
+    _waveshape = Parameter(name='OscillatorWaveShape', type='enum', dict=Oscillator.Waveforms)
+    _octave = Parameter(name='OscillatorOct', type='float', min=-3.0, max=3.0)
+    _semi = Parameter(name='OscillatorSemi', type='float', min=-12.0, max=12.0)
+    _detune = Parameter(name='OscillatorDetune', type='float', min=0.0, max=1.0)
+    _mode = Parameter(name='OscillatorMode', type='enum', dict=Oscillator.Modes)
+    _envtime = Parameter(name='OscillatorEnvTime', type='float', min=0.0, max=1.0)
+    _envamount = Parameter(name='OscillatorEnvAmount', type='float', min=-1.0, max=1.0)
+    _modulation1 = Parameter(name='OscillatorModulation1', type='float', min=0.0, max=1.0)
+    _pulsewidth = Parameter(name='OscillatorPulseWidth', type='float', min=0.0, max=1.0)
+    _subamount = Parameter(name='OscillatorSubAmount', type='float', min=0.0, max=1.0)
+    _filterbalance = Parameter(name='OscillatorBalance', type='float', min=0.0, max=1.0)
+    _level = Parameter(name='OscillatorLevel', type='float', min=0.0, max=1.0)
+    _lfomodpitch = Parameter(name='OscillatorLFOModPitch', type='float', min=0.0, max=1.0)
+    _lfomodpw = Parameter(name='OscillatorLFOModPW', type='float', min=0.0, max=1.0)
+    
     def __init__(self,xmltree, osc_number):
-        ''' Create an instance of an Oscillator wrapping oscillator number <osc_number> in the xmltree provided
-        '''
+        """ Create an instance of an Oscillator wrapping oscillator number <osc_number> in the xmltree provided
+        """
         chain_name = 'SignalChain%d' % osc_number
         self.signalchain = getattr(xmltree.Ableton.UltraAnalog, chain_name)
 
-        # Parameter Definitions
-        self._toggle = {'name': 'OscillatorToggle', 'type': 'bool'}
-        self._waveshape = {'name': 'OscillatorWaveShape','type': 'enum',
-            'min': Oscillator.Waveforms['SINE'],
-            'max': Oscillator.Waveforms['NOISE'], 'dict': Oscillator.Waveforms}
-        self._octave = {'name': 'OscillatorOct', 'type': 'float', 'min': -3.0,
-            'max': 3.0}
-        self._semi = {'name': 'OscillatorSemi', 'type': 'float',
-            'min': -12.0, 'max': 12.0}
-        self._detune = {'name': 'OscillatorDetune', 'type': 'float', 'min': 0.0,
-            'max': 1.0}
-        self._mode = {'name': 'OscillatorMode', 'type': 'enum',
-            'min': Oscillator.Modes['SUB'],'max': Oscillator.Modes['SYNC'],
-            'dict': Oscillator.Modes}
-        self._envtime = {'name': 'OscillatorEnvTime', 'type': 'float',
-            'min': 0.0, 'max': 1.0}
-        self._envamount = {'name': 'OscillatorEnvAmount', 'type': 'float',
-                           'min': -1.0, 'max': 1.0}
-        self._modulation1 = {'name': 'OscillatorModulation1', 'type': 'float',
-                           'min': 0.0, 'max': 1.0}
-        self._pulsewidth = {'name': 'OscillatorPulseWidth', 'type': 'float',
-                           'min': 0.0, 'max': 1.0}
-        self._subamount = {'name': 'OscillatorSubAmount', 'type': 'float',
-                           'min': 0.0, 'max': 1.0}
-        self._balance = {'name': 'OscillatorBalance', 'type': 'float',
-                           'min': 0.0, 'max': 1.0}
-        self._level = {'name': 'OscillatorLevel', 'type': 'float',
-                           'min': 0.0, 'max': 1.0}
-        
-        
         
     @property
     def toggle(self):
-        return get_value(self._toggle, self.signalchain)
+        return get_value(Oscillator._toggle, self.signalchain)
     
     @toggle.setter
     def toggle(self, value):
-        set_value(self._toggle, value, self.signalchain)
+        set_value(Oscillator._toggle, value, self.signalchain)
     
     @property
     def waveshape(self):
-        return get_value(self._waveshape, self.signalchain)
+        return get_value(Oscillator._waveshape, self.signalchain)
     
     @waveshape.setter
     def waveshape(self, value):
-        set_value(self._waveshape, value, self.signalchain)
+        set_value(Oscillator._waveshape, value, self.signalchain)
         
     @property
     def octave(self):
-        return get_value(self._octave, self.signalchain)
+        return get_value(Oscillator._octave, self.signalchain)
     
     @octave.setter
     def octave(self, value):
-        set_value(self._octave, value, self.signalchain)
+        set_value(Oscillator._octave, value, self.signalchain)
     
     @property
     def semi(self):
-        return get_value(self._semi, self.signalchain)
+        return get_value(Oscillator._semi, self.signalchain)
     
     @semi.setter
     def semi(self, value):
-        set_value(self._semi, value, self.signalchain)
+        set_value(Oscillator._semi, value, self.signalchain)
     
     @property
     def detune(self):
-        return get_value(self._detune, self.signalchain)
+        return get_value(Oscillator._detune, self.signalchain)
     
     @detune.setter
     def detune(self, value):
-        set_value(self._detune, value, self.signalchain)
+        set_value(Oscillator._detune, value, self.signalchain)
     
     @property
     def mode(self):
-        return get_value(self._mode, self.signalchain)
+        return get_value(Oscillator._mode, self.signalchain)
     
     @mode.setter
     def mode(self, value):
-        set_value(self._mode, Oscillator.Modes[value])
+        set_value(Oscillator._mode, Oscillator.Modes[value])
         
     @property
     def envtime(self):
-        return get_value(self._envtime, self.signalchain)
+        return get_value(Oscillator._envtime, self.signalchain)
     
     @envtime.setter
     def envtime(self, value):
-        set_value(self._envtime, value, self.signalchain)
+        set_value(Oscillator._envtime, value, self.signalchain)
     
     @property
     def envamount(self):
-        return get_value(self._envamount, self.signalchain)
+        return get_value(Oscillator._envamount, self.signalchain)
     
     @envamount.setter
     def envamount(self, value):
-        set_value(self._envamount, value, self.signalchain)   
+        set_value(Oscillator._envamount, value, self.signalchain)   
     
     @property
     def modulation1(self):
-        return get_value(self._modulation1, self.signalchain)
+        return get_value(Oscillator._modulation1, self.signalchain)
     
     @modulation1.setter
     def modulation1(self, value):
-        set_value(self._modulation1, value, self.signalchain)
+        set_value(Oscillator._modulation1, value, self.signalchain)
     
     @property
     def pulsewidth(self):
-        return get_value(self._pulsewidth, self.signalchain)
+        return get_value(Oscillator._pulsewidth, self.signalchain)
     
     @pulsewidth.setter
     def pulsewidth(self, value):
-        set_value(self._pulsewidth, value, self.signalchain)
+        set_value(Oscillator._pulsewidth, value, self.signalchain)
     
     @property
     def subamount(self):
-        return get_value(self._subamount, self.signalchain)
+        return get_value(Oscillator._subamount, self.signalchain)
     
     @subamount.setter
     def subamount(self, value):
-        set_value(self._subamount, value, self.signalchain)
+        set_value(Oscillator._subamount, value, self.signalchain)
     
     @property
-    def balance(self):
-        return get_value(self._balance, self.signalchain)
+    def filterbalance(self):
+        return get_value(Oscillator._filterbalance, self.signalchain)
     
-    @balance.setter
-    def balance(self, value):
-        set_value(self._balance, self.signalchain)        
+    @filterbalance.setter
+    def filterbalance(self, value):
+        set_value(Oscillator._filterbalance, self.signalchain)        
     
     @property
     def level(self):
-        return get_value(self._level, self.signalchain)
+        return get_value(Oscillator._level, self.signalchain)
     
     @level.setter
     def level(self, value):
-        set_value(self._level, value, self.signalchain) 
+        set_value(Oscillator._level, value, self.signalchain) 
     
     
     @property
     def lfomodpitch(self):
-        return get_value(self.signalchain.OscillatorLFOModPitch)
+        return get_value(Oscillator._lfomodpitch, self.signalchain)
     
     @lfomodpitch.setter
     def lfomodpitch(self, value):
-        value = 0 if value < 0 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.OscillatorLFOModPitch, to_write)
+        set_value(Oscillator._lfomodpitch, value, self.signalchain)
     
     @property
     def lfomodpw(self):
-        return get_value(self.signalchain.OscillatorLFOModPW)
+        return get_value(Oscillator._lfomodpw, self.signalchain)
     
     @lfomodpw.setter
     def lfomodpw(self, value):
-        value = 0 if value < 0 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.OscillatorLFOModPW, to_write)
+        set_value(Oscillator._lfomodpw, value, self.signalchain)
         
-        
-    def _int2wave(self, value):
-        for wave, val in Oscillator.Waveforms.iteritems():
-            if val == value:
-                return wave
-        
-    def _int2mode(self, value):
-        for mode, val in Oscillator.Modes.iteritems():
-            if val == value:
-                return mode
         
 class Filter(object):
-    '''        
+    """        
     self.toggle                 # Filter Enabled {True False}
     self.type                   # Filter Type {LP12 LP24 BP6 BP12 N2P N4P HP12 HP24 F6 F12}
     self.drive                  # Filter Drive {OFF SYM1 SYM2 SYM3 ASYM1 ASYM2 ASYM3}
@@ -317,7 +286,7 @@ class Filter(object):
     self.envcutoffmod           # Filter Env Cutoff Mod [-1.0 1.0]
     self.lfoqmod                # LFO Q Mod [-1.0 1.0]
     self.envqmod                # Env Q Mod [-1.0 1.0]
-    '''
+    """
     # Map useful names to XML enumeration
     Types = {'LP12': 0, 'LP24': 1, 'BP6': 2, 'BP12': 3, 'N2P': 4, 'N4P': 5,
              'HP12': 6, 'HP24': 7, 'F6': 8, 'F12': 9}
@@ -449,7 +418,7 @@ class Filter(object):
                 return drive
 
 class Amp(object):
-    '''
+    """
     self.toggle                 # Amp Enabled {True False}
     self.level                  # Amp Level [0 1.0]
     self.pan                    # Pan [0 1.0]
@@ -458,7 +427,7 @@ class Amp(object):
     self.kbdpanmod              # Keyboard Pan Mod [-1.0 1.0]
     self.lfppanmod              # LFO Pan Mod   [-1.0 1.0]
     self.envpanmod              # Env Pan Mod   [-1.0 1.0]
-    '''
+    """
     def __init__(self, xmltree, amp_number):
         chain_name = 'SignalChain%d' % amp_number
         self.signalchain = getattr(xmltree.Ableton.UltraAnalog, chain_name)
@@ -554,7 +523,7 @@ class Amp(object):
         set_value(self.signalchain.AmplifierEnvPanMod, to_write) 
  
 class LFO(object):
-    '''
+    """
     self.toggle         # LFO Enabled {True False}
     self.waveshape      # LFO Wave shape {SINE TRI RECT NOISE1 NOISE2}
     self.sync           # Tempo Sync Rate [0 23]
@@ -565,7 +534,7 @@ class LFO(object):
     self.phase          # Phase Offset  [0 1.0]
     self.delay          # Delay   [0 1.0]
     self.fadein         # Fade In   [0 1.0]
-    '''
+    """
     # WAVEFORMS
     Waveforms = {'SINE': 0, 'TRI': 1, 'RECT': 2, 'NOISE1': 3, 'NOISE2': 4}
     

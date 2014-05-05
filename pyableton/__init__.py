@@ -20,9 +20,9 @@
 #   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #   DEALINGS IN THE SOFTWARE.
 
-''' PyAbleton
+""" PyAbleton
 A library for creating and editing Ableton Live instrument/effect presets in Python.
-'''
+"""
 
 __author__ = 'ham@hamiltonkib.be'
 __version__ = '1.0'
