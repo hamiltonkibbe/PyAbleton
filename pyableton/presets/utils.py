@@ -31,12 +31,13 @@ class AbletonParameter(object):
     """ A simple parameter wrapping class storing the XML element name, min/max values, and
     semantic data for enum parameters
     """
-    def __init__(self, name=None, type=None,min=None,max=None,dict=None):
+    def __init__(self, name=None, type=None,min=None,max=None,dict=None, converter=None):
         self.name = name
         self.type = type
         self.min = min
         self.max = max
         self.dict = dict
+        self.converter = converter
         
         # Automatically calculate min and max for enum parameters
         if self.dict is not None:
@@ -70,18 +71,11 @@ def xml2preset(filename):
 
     
 
-def get_value(parameter, parent=None):
-    """ parent should eventually be required....
-    the single-parameter option is here until I can remove all the references
-    to it. The 2 parameter version takes a parameter dict which stores the type
-    and min/max values.
+def get_value(parameter, parent):
+    """ Get the value of the passed parameter with the given parent
     """
-    if parent is None:
-        val = parameter.ArrangerAutomation.Events.contents[1]['Value']
-        eventname = parameter.ArrangerAutomation.Events.contents[1].name
-    else:
-        val = getattr(parent, parameter.name).ArrangerAutomation.Events.contents[1]['Value']
-        eventname = getattr(parent, parameter.name).ArrangerAutomation.Events.contents[1].name
+    val = getattr(parent, parameter.name).ArrangerAutomation.Events.contents[1]['Value']
+    eventname = getattr(parent, parameter.name).ArrangerAutomation.Events.contents[1].name
     if 'BoolEvent' in eventname:
         return (string2bool(val))
     elif 'EnumEvent' in eventname:
@@ -97,29 +91,23 @@ def get_value(parameter, parent=None):
         return float(val)
 
 
-def set_value(parameter, value, parent=None):
-    """ parent should eventually be required....
-    the two-parameter option is here until I can remove all the references
-    to it. The 3 parameter version takes a parameter dict which stores the type
-    and min/max values, bounds checking should occur here, not outside calls to
-    set_value.
+def set_value(parameter, value, parent):
+    """ Set the value of the parameter with the given parent to "value"
+    do bounds checking and clamp values to usable range.
     """
-    if parent is None:
-        parameter.ArrangerAutomation.Events.contents[1]['Value'] = value
-    else:
-        if parameter.type is 'bool':
-            to_write = u'true' if value else u'false'
-        elif parameter.type is 'int':
-            to_write = u'%d' % clamp(value)
-        elif parameter.type is 'float':
-            to_write = u'%f' % clamp(value)
-        elif parameter.type is 'enum':
-            for key, val in parameter.dict.iteritems():
-                if key == value.upper():
-                    value = val
-                    break
-            to_write = u'%d' % value
-        getattr(parent,parameter.name).ArrangerAutomation.Events.contents[1]['Value'] = to_write
+    if parameter.type is 'bool':
+        to_write = u'true' if value else u'false'
+    elif parameter.type is 'int':
+        to_write = u'%d' % clamp(value)
+    elif parameter.type is 'float':
+        to_write = u'%f' % clamp(value)
+    elif parameter.type is 'enum':
+        for key, val in parameter.dict.iteritems():
+            if key == value.upper():
+                value = val
+                break
+        to_write = u'%d' % value
+    getattr(parent,parameter.name).ArrangerAutomation.Events.contents[1]['Value'] = to_write
     
     
 def clamp(value, parameter):

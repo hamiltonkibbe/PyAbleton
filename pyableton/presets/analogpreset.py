@@ -504,123 +504,110 @@ class LFO(object):
         # Parameter Definitions
         self._toggle = Parameter(name='LFOToggle', type='bool')
         self._waveshape = Parameter(name='LFOWaveShape', type='enum', dict=LFO.Waveforms)
- 
+        self._sync = Parameter(name='LFOSync', type='int', min=0, max=23)
+        self._synctoggle = Parameter(name='LFOSyncToggle', type='int', min=0, max=1)
+        self._gatereset = Parameter(name='LFOGateReset', type='bool')
+        self._pulsewidth = Parameter(name='LFOPulseWidth', type='float', min=0.0, max=1.0)
+        self._speed = Parameter(name='LFOSpeed', type='float', min=0.0, max=1.0)
+        self._phase = Parameter(name='LFOPhase', type='float', min=0.0, max=1.0)
+        self._delay = Parameter(name='LFODelay', type='float', min=0.0, max=1.0)
+        self._fadein = Parameter(name='LFOFadeIn', type='float', min=0.0, max=1.0)
+        
     @property
     def toggle(self):
-        return get_value(self.signalchain.LFOToggle)
+        return get_value(self._toggle, self.signalchain)
     
     @toggle.setter
     def toggle(self, value):
-        if value:
-            to_write = u'true'
-        else:
-            to_write = u'false'
-        set_value(self.signalchain.LFOToggle, to_write)
+        set_value(self._toggle, value, self.signalchain)
  
     @property
     def waveshape(self):
-        return self._int2wave(get_value(self.signalchain.LFOWaveShape))
+        return get_value(self._waveshape, self.signalchain)
     
     @waveshape.setter
     def waveshape(self, value):
-        to_write = (u'%d' % LFO.Waveforms[value])
-        set_value(self.signalchain.LFOWaveShape, to_write)
+        set_value(self._waveshape, value, self.signalchain)
  
  
     @property
     def sync(self):
-        return get_value(self.signalchain.LFOSync)
+        return get_value(self._sync, self.signalchain)
     
     @sync.setter
     def sync(self, value):
-        value = 0 if value < 0 else value
-        value = 23 if value > 23 else 23
-        to_write = u'%f' % value
-        set_value(self.signalchain.LFOSync, to_write)
+        set_value(self._sync, value, self.signalchain)
         
     @property
     def synctoggle(self):
-        return get_value(self.signalchain.LFOSyncToggle) == True
+        return get_value(self._synctoggle, self.signalchain)
     
     @synctoggle.setter
     def synctoggle(self, value):
-        value = 1 if value else value
-        value = 0 if not value else value
-        to_write = u'%d' % value
-        set_value(self.signalchain.LFOSyncToggle, to_write)
+        set_value(self._synctoggle, value, self.signalchain)
         
     @property
     def gatereset(self):
-        return get_value(self.signalchain.LFOGateReset)
+        return get_value(self._gatereset, self.signalchain)
         
     @gatereset.setter
     def gatereset(self, value):
-        if value:
-            to_write = u'true'
-        else:
-            to_write = u'false'
-        set_value(self.signalchain.LFOGateReset, to_write)
+        set_value(self._gatereset, value, self.signalchain)
     
     @property
     def pulsewidth(self):
-        return get_value(self.signalchain.LFOPulseWidth)
+        return get_value(self._pulsewidth, self.signalchain)
         
     @pulsewidth.setter
-    def pulsewidth(self):
-        value = 0 if value < 0 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.LFOPulseWidth, to_write)
+    def pulsewidth(self, value):
+        set_value(self._pulsewidth, value, self.signalchain)
         
     @property
     def speed(self):
-        return get_value(self.signalchain.LFOSpeed)
+        return get_value(self._speed, self.signalchain)
         
     @speed.setter
     def speed(self, value): 
-        value = 0 if value < 0 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.LFOSpeed, to_write)
+        set_value(self._speed, value, self.signalchain)
         
     @property
     def phase(self):
-        return get_value(self.signalchain.LFOPhase)
+        return get_value(self._phase, self.signalchain)
         
     @phase.setter
     def phase(self, value): 
-        value = 0 if value < 0 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.LFOPhase, to_write)  
+        set_value(self._phase, value, self.signalchain)  
     
     @property
     def delay(self):
-        return get_value(self.signalchain.LFODelay)
+        return get_value(self._delay, self.signalchain)
         
     @delay.setter
     def delay(self, value): 
-        value = 0 if value < 0 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.LFODelay, to_write)  
+        set_value(self._delay, value, self.signalchain)  
  
-    
     @property
     def fadein(self):
-        return get_value(self.signalchain.LFOFadeIn)
+        return get_value(self._fadein, self.signalchain)
         
     @fadein.setter
     def fadein(self, value): 
-        value = 0 if value < 0 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.LFOFadeIn, to_write) 
+        set_value(self._fadein, value, self.signalchain) 
  
-    
-    def _int2wave(self, value):
-        for wave, val in LFO.Waveforms.iteritems():
-            if val == value:
-                return wave
-                
- 
+
+class Envelope(object):
+    """ Envelope class
+    self.exponentialslope   bool
+    self.loop               int
+    self.freerun            bool
+    self.legato             bool
+    self.attackmod          float
+    self.attacktime         float
+    self.decaytime          float
+    self.ampmod             float
+    self.sustainlevel       float
+    self.sustaintime        float
+    self.releasetime        float
+    """
+    def __init__(self, chain, number):
+        pass
