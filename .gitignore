@@ -31,3 +31,4 @@ pip-delete-this-directory.txt
 
 # Komodo Project
 *.komodoproject
+.komodo*

@@ -67,42 +67,39 @@ class AnalogGlobals(object):
     Poly = {'mono': 0, '2': 1, '4': 2,'8': 3, '12': 4, '16': 5, '20': 6,
             '24': 7, '28': 8, '32': 9 }
     
-    # Parameter Definitions
-    _polyphony = Parameter(name='Polyphony', type='enum', dict=AnalogGlobals.Poly)
-    _pitchbendrange = Parameter(name='PitchBendRange', type='float', min=0.0, max=1.0)
-    _volume = Parameter(name='Volume', type='float', min=0.0, max=1.0)
-    
     
     def __init__(self, xmltree):
         self.parent = getattr(xmltree.Ableton, 'UltraAnalog')
-
+    
+        # Parameter Definitions
+        self._polyphony = Parameter(name='Polyphony', type='enum', dict=AnalogGlobals.Poly)
+        self._pitchbendrange = Parameter(name='PitchBendRange', type='float', min=0.0, max=1.0)
+        self._volume = Parameter(name='Volume', type='float', min=0.0, max=1.0)
         
     @property
     def polyphony(self):
-        return get_value(AnalogGlobals._polyphony, self.parent)
+        return get_value(self._polyphony, self.parent)
     
     @polyphony.setter
     def polyphony(self, value):
-        set_value(AnalogGlobals._polyphony, value, self.parent)
+        set_value(self._polyphony, value, self.parent)
         
     @property
     def pitchbendrange(self):
-        return get_value(AnalogGlobals._pitchbendrange, self.parent)
+        return get_value(self._pitchbendrange, self.parent)
     
     @pitchbendrange.setter
     def pitchbendrange(self, value):
-        set_value(AnalogGlobals._pitchbendrange, value, self.parent)
+        set_value(self._pitchbendrange, value, self.parent)
 
     @property
     def volume(self):
-        return get_value(AnalogGlobals._volume, self.parent)
+        return get_value(self._volume, self.parent)
     
     @volume.setter
     def volume(self, value):
-        set_value(AnalogGlobals._volume, value, self.parent)
+        set_value(self._volume, value, self.parent)
      
-
-
 
 class Oscillator(object):
     """ Wrapper class for the Oscillators in an Ableton Analog preset.
@@ -128,150 +125,152 @@ class Oscillator(object):
     Waveforms = {'SINE': 0, 'SAW': 1, 'RECT': 2, 'NOISE': 3}
     Modes = {'SUB': 0, 'SYNC': 1}
     
-    # Parameter Definitions
-    _toggle = Parameter(name='OscillatorToggle', type='bool')
-    _waveshape = Parameter(name='OscillatorWaveShape', type='enum', dict=Oscillator.Waveforms)
-    _octave = Parameter(name='OscillatorOct', type='float', min=-3.0, max=3.0)
-    _semi = Parameter(name='OscillatorSemi', type='float', min=-12.0, max=12.0)
-    _detune = Parameter(name='OscillatorDetune', type='float', min=0.0, max=1.0)
-    _mode = Parameter(name='OscillatorMode', type='enum', dict=Oscillator.Modes)
-    _envtime = Parameter(name='OscillatorEnvTime', type='float', min=0.0, max=1.0)
-    _envamount = Parameter(name='OscillatorEnvAmount', type='float', min=-1.0, max=1.0)
-    _modulation1 = Parameter(name='OscillatorModulation1', type='float', min=0.0, max=1.0)
-    _pulsewidth = Parameter(name='OscillatorPulseWidth', type='float', min=0.0, max=1.0)
-    _subamount = Parameter(name='OscillatorSubAmount', type='float', min=0.0, max=1.0)
-    _filterbalance = Parameter(name='OscillatorBalance', type='float', min=0.0, max=1.0)
-    _level = Parameter(name='OscillatorLevel', type='float', min=0.0, max=1.0)
-    _lfomodpitch = Parameter(name='OscillatorLFOModPitch', type='float', min=0.0, max=1.0)
-    _lfomodpw = Parameter(name='OscillatorLFOModPW', type='float', min=0.0, max=1.0)
+    
     
     def __init__(self,xmltree, osc_number):
         """ Create an instance of an Oscillator wrapping oscillator number <osc_number> in the xmltree provided
         """
         chain_name = 'SignalChain%d' % osc_number
         self.signalchain = getattr(xmltree.Ableton.UltraAnalog, chain_name)
+        
+        # Parameter Definitions
+        self._toggle = Parameter(name='OscillatorToggle', type='bool')
+        self._waveshape = Parameter(name='OscillatorWaveShape', type='enum', dict=Oscillator.Waveforms)
+        self._octave = Parameter(name='OscillatorOct', type='float', min=-3.0, max=3.0)
+        self._semi = Parameter(name='OscillatorSemi', type='float', min=-12.0, max=12.0)
+        self._detune = Parameter(name='OscillatorDetune', type='float', min=0.0, max=1.0)
+        self._mode = Parameter(name='OscillatorMode', type='enum', dict=Oscillator.Modes)
+        self._envtime = Parameter(name='OscillatorEnvTime', type='float', min=0.0, max=1.0)
+        self._envamount = Parameter(name='OscillatorEnvAmount', type='float', min=-1.0, max=1.0)
+        self._modulation1 = Parameter(name='OscillatorModulation1', type='float', min=0.0, max=1.0)
+        self._pulsewidth = Parameter(name='OscillatorPulseWidth', type='float', min=0.0, max=1.0)
+        self._subamount = Parameter(name='OscillatorSubAmount', type='float', min=0.0, max=1.0)
+        self._filterbalance = Parameter(name='OscillatorBalance', type='float', min=0.0, max=1.0)
+        self._level = Parameter(name='OscillatorLevel', type='float', min=0.0, max=1.0)
+        self._lfomodpitch = Parameter(name='OscillatorLFOModPitch', type='float', min=0.0, max=1.0)
+        self._lfomodpw = Parameter(name='OscillatorLFOModPW', type='float', min=0.0, max=1.0)
 
         
     @property
     def toggle(self):
-        return get_value(Oscillator._toggle, self.signalchain)
+        return get_value(self._toggle, self.signalchain)
     
     @toggle.setter
     def toggle(self, value):
-        set_value(Oscillator._toggle, value, self.signalchain)
+        set_value(self._toggle, value, self.signalchain)
     
     @property
     def waveshape(self):
-        return get_value(Oscillator._waveshape, self.signalchain)
+        return get_value(self._waveshape, self.signalchain)
     
     @waveshape.setter
     def waveshape(self, value):
-        set_value(Oscillator._waveshape, value, self.signalchain)
+        set_value(self._waveshape, value, self.signalchain)
         
     @property
     def octave(self):
-        return get_value(Oscillator._octave, self.signalchain)
+        return get_value(self._octave, self.signalchain)
     
     @octave.setter
     def octave(self, value):
-        set_value(Oscillator._octave, value, self.signalchain)
+        set_value(self._octave, value, self.signalchain)
     
     @property
     def semi(self):
-        return get_value(Oscillator._semi, self.signalchain)
+        return get_value(self._semi, self.signalchain)
     
     @semi.setter
     def semi(self, value):
-        set_value(Oscillator._semi, value, self.signalchain)
+        set_value(self._semi, value, self.signalchain)
     
     @property
     def detune(self):
-        return get_value(Oscillator._detune, self.signalchain)
+        return get_value(self._detune, self.signalchain)
     
     @detune.setter
     def detune(self, value):
-        set_value(Oscillator._detune, value, self.signalchain)
+        set_value(self._detune, value, self.signalchain)
     
     @property
     def mode(self):
-        return get_value(Oscillator._mode, self.signalchain)
+        return get_value(self._mode, self.signalchain)
     
     @mode.setter
     def mode(self, value):
-        set_value(Oscillator._mode, Oscillator.Modes[value])
+        set_value(self._mode, Oscillator.Modes[value])
         
     @property
     def envtime(self):
-        return get_value(Oscillator._envtime, self.signalchain)
+        return get_value(self._envtime, self.signalchain)
     
     @envtime.setter
     def envtime(self, value):
-        set_value(Oscillator._envtime, value, self.signalchain)
+        set_value(self._envtime, value, self.signalchain)
     
     @property
     def envamount(self):
-        return get_value(Oscillator._envamount, self.signalchain)
+        return get_value(self._envamount, self.signalchain)
     
     @envamount.setter
     def envamount(self, value):
-        set_value(Oscillator._envamount, value, self.signalchain)   
+        set_value(self._envamount, value, self.signalchain)   
     
     @property
     def modulation1(self):
-        return get_value(Oscillator._modulation1, self.signalchain)
+        return get_value(self._modulation1, self.signalchain)
     
     @modulation1.setter
     def modulation1(self, value):
-        set_value(Oscillator._modulation1, value, self.signalchain)
+        set_value(self._modulation1, value, self.signalchain)
     
     @property
     def pulsewidth(self):
-        return get_value(Oscillator._pulsewidth, self.signalchain)
+        return get_value(self._pulsewidth, self.signalchain)
     
     @pulsewidth.setter
     def pulsewidth(self, value):
-        set_value(Oscillator._pulsewidth, value, self.signalchain)
+        set_value(self._pulsewidth, value, self.signalchain)
     
     @property
     def subamount(self):
-        return get_value(Oscillator._subamount, self.signalchain)
+        return get_value(self._subamount, self.signalchain)
     
     @subamount.setter
     def subamount(self, value):
-        set_value(Oscillator._subamount, value, self.signalchain)
+        set_value(self._subamount, value, self.signalchain)
     
     @property
     def filterbalance(self):
-        return get_value(Oscillator._filterbalance, self.signalchain)
+        return get_value(self._filterbalance, self.signalchain)
     
     @filterbalance.setter
     def filterbalance(self, value):
-        set_value(Oscillator._filterbalance, self.signalchain)        
+        set_value(self._filterbalance, self.signalchain)        
     
     @property
     def level(self):
-        return get_value(Oscillator._level, self.signalchain)
+        return get_value(self._level, self.signalchain)
     
     @level.setter
     def level(self, value):
-        set_value(Oscillator._level, value, self.signalchain) 
+        set_value(self._level, value, self.signalchain) 
     
     
     @property
     def lfomodpitch(self):
-        return get_value(Oscillator._lfomodpitch, self.signalchain)
+        return get_value(self._lfomodpitch, self.signalchain)
     
     @lfomodpitch.setter
     def lfomodpitch(self, value):
-        set_value(Oscillator._lfomodpitch, value, self.signalchain)
+        set_value(self._lfomodpitch, value, self.signalchain)
     
     @property
     def lfomodpw(self):
-        return get_value(Oscillator._lfomodpw, self.signalchain)
+        return get_value(self._lfomodpw, self.signalchain)
     
     @lfomodpw.setter
     def lfomodpw(self, value):
-        set_value(Oscillator._lfomodpw, value, self.signalchain)
+        set_value(self._lfomodpw, value, self.signalchain)
         
         
 class Filter(object):
@@ -293,129 +292,104 @@ class Filter(object):
     Drives ={'OFF': 0, 'SYM1': 1, 'SYM2': 2, 'SYM3': 3, 'ASYM1': 4, 'ASYM2': 5,
             'ASYM3': 6}
     
+    
     def __init__(self, xmltree, filter_number):
         chain_name = 'SignalChain%d' % filter_number
         self.signalchain = getattr(xmltree.Ableton.UltraAnalog, chain_name)
-    
+        
+        # Parameter definitions
+        self._toggle = Parameter(name='FilterToggle', type='bool')
+        self._type = Parameter(name='FilterType', type='enum', dict=Filter.Types)
+        self._drive = Parameter(name='FilterDrive', type='enum', dict=Filter.Drives)
+        self._kbdcutoffmod = Parameter(name='FilterKbdCutoffMod', type='float', min=-1.0, max=1.0)
+        self._lfocutoffmod = Parameter(name='FilterLFOCutoffMod', type='float', min=-1.0, max=1.0)
+        self._envcutoffmod = Parameter(name='FilterEnvCutoffMod', type='float', min=-1.0, max=1.0)
+        self._cutofffrequency = Parameter(name='FilterCutoffFrequency', type='float', min=0.0, max=1.0)
+        self._qfactor = Parameter(name='FilterQFactor', type='float', min=0.0, max=1.0)
+        self._envqmod = Parameter(name='FilterEnvQMod', type='float', min=-1.0, max=1.0)
+        self._lfoqmod = Parameter(name='FilterLFOQMod', type='float', min=-1.0, max=1.0)
+        
     @property
     def toggle(self):
-        return get_value(self.signalchain.FilterToggle)
+        return get_value(self._toggle, self.signalchain)
     
     @toggle.setter
     def toggle(self, value):
-        if value:
-            to_write = u'true'
-        else:
-            to_write = u'false'
-        set_value(self.signalchain.FilterToggle, to_write)
+        set_value(self._toggle, value, self.signalchain)
     
     @property
     def type(self):
-        return self._int2type(get_value(self.signalchain.FilterType))
+        return get_value(self._type, self.signalchain)
     
     @type.setter
     def type(self, value):
-        to_write = (u'%d' % Filter.Types[value])
-        set_value(self.signalchain.FilterType, to_write)
+        set_value(self._type, value, self.signalchain)
 
     @property
     def drive(self):
-        return self._int2type(get_value(self.signalchain.FilterDrive))
+        return get_value(self._drive, self.signalchain)
 
     @drive.setter
     def drive(self, value):
-        to_write = (u'%d' % Filter.Drives[value])
-        set_value(self.signalchain.FilterDrive, to_write)
-
+        set_value(self._drive, value, self.signalchain)
 
     @property
     def kbdcutoffmod(self):
-        return  get_value(self.signalchain.FilterKbdCutoffMod)
+        return  get_value(self._kbdcutoffmod, self.signalchain)
 
     @kbdcutoffmod.setter
     def kbdcutoffmod(self, value):
-        value = -1 if value < -1 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.FilterKbdCutoffMod, to_write)
+        set_value(self._kbdcutoffmod, value, self.signalchain)
 
     @property
     def lfocutoffmod(self):
-        return  get_value(self.signalchain.FilterLFOCutoffMod)
+        return  get_value(self._lfocutoffmod, self.signalchain)
 
     @lfocutoffmod.setter
     def lfocutoffmod(self, value):
-        value = -1 if value < -1 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.FilterLFOCutoffMod, to_write)
+        set_value(self._lfocutoffmod, value, self.signalchain)
 
     @property
     def envcutoffmod(self):
-        return  get_value(self.signalchain.FilterEnvCutoffMod)
+        return  get_value(self._envcutoffmod, self.signalchain)
 
     @envcutoffmod.setter
     def envcutoffmod(self, value):
-        value = -1 if value < -1 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.FilterEnvCutoffMod, to_write)
-
+        set_value(self._envcutoffmod, value, self.signalchain)
 
 
     @property
     def cutofffrequency(self):
-        return  get_value(self.signalchain.FilterCutoffFrequency)
+        return  get_value(self._cutofffrequency, self.signalchain)
 
     @cutofffrequency.setter
     def cutofffrequency(self, value):
-        value = 0 if value < 0 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.cutofffrequency, to_write)
+        set_value(self._cutofffrequency, value, self.signalchain)
 
     @property
     def qfactor(self):
-        return  get_value(self.signalchain.FilterQFactor)
+        return  get_value(self._qfactor, self.signalchain)
 
     @qfactor.setter
     def qfactor(self, value):
-        value = 0 if value < 0 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.FilterQFactor, to_write)
+        set_value(self._qfactor, value, self.signalchain)
 
     @property
     def lfoqmod(self):
-        return  get_value(self.signalchain.FilterLFOQMod)
+        return  get_value(self._lfoqmod, self.signalchain)
 
     @lfoqmod.setter
     def lfoqmod(self, value):
-        value = -1 if value < -1 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.FilterLFOQMod, to_write)
+        set_value(self._lfoqmod, value, self.signalchain)
 
     @property
     def envqmod(self):
-        return  get_value(self.signalchain.FilterEnvQMod)
+        return  get_value(self._envqmod, self.signalchain)
 
     @envqmod.setter
     def envqmod(self, value):
-        value = -1 if value < -1 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.FilterEnvQMod, to_write)
+        set_value(self._envqmod, value, self.signalchain)
 
-    def _int2type(self, value):
-        for t, val in Filter.Types.iteritems():
-            if val == value:
-                return t
-        
-    def _int2drive(self, value):
-        for drive, val in Filter.Drives.iteritems():
-            if val == value:
-                return drive
 
 class Amp(object):
     """
@@ -425,102 +399,87 @@ class Amp(object):
     self.kbdampmod              # Keyboard Amp Mod [-1.0 1.0]
     self.lfoampmod              # LFO Amp Mod [-1.0 1.0]
     self.kbdpanmod              # Keyboard Pan Mod [-1.0 1.0]
-    self.lfppanmod              # LFO Pan Mod   [-1.0 1.0]
+    self.lfopanmod              # LFO Pan Mod   [-1.0 1.0]
     self.envpanmod              # Env Pan Mod   [-1.0 1.0]
     """
     def __init__(self, xmltree, amp_number):
         chain_name = 'SignalChain%d' % amp_number
         self.signalchain = getattr(xmltree.Ableton.UltraAnalog, chain_name)
         
+        # Parameter Definitions
+        self._toggle = Parameter(name='AmplifierToggle', type='bool')
+        self._level = Parameter(name='AmplifierLevel',type='float', min=0.0, max=1.0)
+        self._pan = Parameter(name='AmplifierPan',type='float', min=0.0, max=1.0)
+        self._kbdampmod = Parameter(name='AmplifierKbdAmpMod', type='float', min=-1.0, max=1.0)
+        self._lfoampmod = Parameter(name='AmplifierLFOAmpMod', type='float', min=-1.0, max=1.0)
+        self._kbdpammod = Parameter(name='AmplifierKbdPanMod', type='float', min=-1.0, max=1.0)
+        self._lfopanmod = Parameter(name='AmplifierLFOPanMod', type='float', min=-1.0, max=1.0)
+        self._envpanmod = Parameter(name='AmplifierEnvPanMod', type='float', min=-1.0, max=1.0)
+        
     @property
     def toggle(self):
-        return get_value(self.signalchain.AmplifierToggle)
+        return get_value(self._toggle, self.signalchain)
     
     @toggle.setter
     def toggle(self, value):
-        if value:
-            to_write = u'true'
-        else:
-            to_write = u'false'
-        set_value(self.signalchain.AmplifierToggle, to_write)
+        set_value(self._toggle, value, self.signalchain)
         
     @property
     def level(self):
-        return get_value(self.signalchain.AmplifierLevel)
+        return get_value(self._level, self.signalchain)
     
     @level.setter
     def level(self, value):
-        value = 0 if value < 0 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.AmplifierLevel, to_write)
+        set_value(self._level, value, self.signalchain)
         
     @property
     def pan(self):
-        return get_value(self.signalchain.AmplifierPan)
+        return get_value(self._pan, self.signalchain)
     
     @pan.setter
     def pan(self, value):
-        value = 0 if value < 0 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.AmplifierPan, to_write)
+        set_value(self._pan, value, self.signalchain)
 
     @property
     def kbdampmod(self):
-        return get_value(self.signalchain.AmplifierKbdAmpMod)
+        return get_value(self._kbdampmod, self.signalchain)
     
     @kbdampmod.setter
     def kbdampmod(self, value):
-        value = -1 if value < -1 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.AmplifierKbdAmpMod, to_write) 
+        set_value(self._kbdampmod, value, self.signalchain) 
         
     @property
     def lfoampmod(self):
-        return get_value(self.signalchain.AmplifierLFOAmpMod)
+        return get_value(self._lfoampmod, self.signalchain)
     
     @lfoampmod.setter
     def lfoampmod(self, value):
-        value = -1 if value < -1 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.AmplifierLFOAmpMod, to_write)  
+        set_value(self._lfoampmod, value, self.signalchain)  
         
         
     @property
     def kbdpanmod(self):
-        return get_value(self.signalchain.AmplifierKbdPanMod)
+        return get_value(self._kbdpanmod, self.signalchain)
     
     @kbdpanmod.setter
     def kbdpanmod(self, value):
-        value = -1 if value < -1 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.AmplifierKbdPanMod, to_write) 
+        set_value(self._kbdpanmod, value, self.signalchain) 
         
     @property
     def lfopanmod(self):
-        return get_value(self.signalchain.AmplifierLFOPanMod)
+        return get_value(self._lfopanmod, self.signalchain)
     
     @lfopanmod.setter
     def lfopanmod(self, value):
-        value = -1 if value < -1 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.AmplifierLFOPanMod, to_write) 
+        set_value(self._lfopanmod, value, self.signalchain) 
         
     @property
     def envpanmod(self):
-        return get_value(self.signalchain.AmplifierEnvPanMod)
+        return get_value(self._envpanmod, self.signalchain)
     
     @envpanmod.setter
     def envpanmod(self, value):
-        value = -1 if value < -1 else value
-        value = 1 if value > 1 else value
-        to_write = u'%f' % value
-        set_value(self.signalchain.AmplifierEnvPanMod, to_write) 
+        set_value(self._envpanmod, self.signalchain) 
  
 class LFO(object):
     """
@@ -541,6 +500,10 @@ class LFO(object):
     def __init__(self, xmltree, lfo_number):
         chain_name = 'SignalChain%d' % lfo_number
         self.signalchain = getattr(xmltree.Ableton.UltraAnalog, chain_name)
+        
+        # Parameter Definitions
+        self._toggle = Parameter(name='LFOToggle', type='bool')
+        self._waveshape = Parameter(name='LFOWaveShape', type='enum', dict=LFO.Waveforms)
  
     @property
     def toggle(self):
