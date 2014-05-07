@@ -22,7 +22,7 @@
 
 """Utilities functions for handling ableton presets
 """
-
+import __builtin__
 import gzip
 import os
 from bs4 import BeautifulSoup
@@ -31,7 +31,7 @@ class AbletonParameter(object):
     """ A simple parameter wrapping class storing the XML element name, min/max values, and
     semantic data for enum parameters
     """
-    def __init__(self, name=None, type=None,min=None,max=None,dict=None, converter=None):
+    def __init__(self, name=None, type=None, min=None, max=None, dict=None, converter=None):
         self.name = name
         self.type = type
         self.min = min
@@ -41,8 +41,8 @@ class AbletonParameter(object):
         
         # Automatically calculate min and max for enum parameters
         if self.dict is not None:
-            self.min = self.min if self.min is not None else min(self.dict.itervalues())
-            self.max = self.max if self.max is not None else max(self.dict.itervalues())
+            self.min = self.min if self.min is not None else __builtin__.min(self.dict.itervalues())
+            self.max = self.max if self.max is not None else __builtin__.max(self.dict.itervalues())
 
     # Allow dict-style semantics
     def __getitem__(self, key):

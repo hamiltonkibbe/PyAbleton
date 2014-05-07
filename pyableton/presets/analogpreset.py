@@ -70,7 +70,7 @@ class AnalogGlobals(object):
     
     def __init__(self, xmltree):
         self.parent = getattr(xmltree.Ableton, 'UltraAnalog')
-    
+        
         # Parameter Definitions
         self._polyphony = Parameter(name='Polyphony', type='enum', dict=AnalogGlobals.Poly)
         self._pitchbendrange = Parameter(name='PitchBendRange', type='float', min=0.0, max=1.0)
@@ -296,6 +296,7 @@ class Filter(object):
     def __init__(self, xmltree, filter_number):
         chain_name = 'SignalChain%d' % filter_number
         self.signalchain = getattr(xmltree.Ableton.UltraAnalog, chain_name)
+        self.envelope = Envelope(self.signalchain, 0)
         
         # Parameter definitions
         self._toggle = Parameter(name='FilterToggle', type='bool')
@@ -308,6 +309,7 @@ class Filter(object):
         self._qfactor = Parameter(name='FilterQFactor', type='float', min=0.0, max=1.0)
         self._envqmod = Parameter(name='FilterEnvQMod', type='float', min=-1.0, max=1.0)
         self._lfoqmod = Parameter(name='FilterLFOQMod', type='float', min=-1.0, max=1.0)
+        
         
     @property
     def toggle(self):
@@ -405,6 +407,7 @@ class Amp(object):
     def __init__(self, xmltree, amp_number):
         chain_name = 'SignalChain%d' % amp_number
         self.signalchain = getattr(xmltree.Ableton.UltraAnalog, chain_name)
+        self.envelope = Envelope(self.signalchain, 1)
         
         # Parameter Definitions
         self._toggle = Parameter(name='AmplifierToggle', type='bool')
@@ -598,7 +601,7 @@ class LFO(object):
 class Envelope(object):
     """ Envelope class
     self.exponentialslope   bool
-    self.loop               int
+    self.loop               enum
     self.freerun            bool
     self.legato             bool
     self.attackmod          float
@@ -609,5 +612,113 @@ class Envelope(object):
     self.sustaintime        float
     self.releasetime        float
     """
-    def __init__(self, chain, number):
-        pass
+    
+    # Map enum to dict
+    Loop = {'OFF': 0, 'AD-R': 1, 'ADR-R': 2, 'ADS-AR': 3}
+    
+    def __init__(self, signalchain, env_number):
+        env_name = 'Envelope.%d' % env_number
+        self.envelope = getattr(signalchain, env_name)
+        
+        self._exponentialslope = Parameter(name='ExponentialSlope', type='bool')
+        self._loop = Parameter(name='Loop', type='enum', dict=Envelope.Loop)
+        self._freerun = Parameter(name='FreeRun', type='bool')
+        self._legato = Parameter(name='Legato', type='bool')
+        self._attackmod = Parameter(name='AttackMod', type='float', min=0.0, max=1.0)
+        self._attacktime = Parameter(name='AttackTime', type='float', min=0.0, max=1.0)
+        self._decaytime = Parameter(name='DecayTime', type='float', min=0.0, max=1.0)
+        self._ampmod = Parameter(name='AmpMod', type='float', min=0.0, max=1.0)
+        self._sustainlevel = Parameter(name='SustainLevel', type='float', min=0.0, max=1.0)
+        self._sustaintime = Parameter(name='SustainTime', type='float', min=0.0, max=1.0)
+        self._releasetime = Parameter(name='ReleaseTime', type='float', min=0.0, max=1.0)
+    
+    
+    @property
+    def exponentialslope(self):
+        return get_value(self._exponentialslope, self.envelope)
+        
+    @exponentialslope.setter
+    def exponentialslope(self, value): 
+        set_value(self._exponentialslope, value, self.envelope) 
+    
+    @property
+    def loop(self):
+        return get_value(self._loop, self.envelope)
+        
+    @loop.setter
+    def loop(self, value): 
+        set_value(self._loop, value, self.envelope)
+        
+    @property
+    def freerun(self):
+        return get_value(self._freerun, self.envelope)
+        
+    @freerun.setter
+    def freerun(self, value): 
+        set_value(self._freerun, value, self.envelope) 
+    
+    @property
+    def legato(self):
+        return get_value(self._legato, self.envelope)
+        
+    @legato.setter
+    def legato(self, value): 
+        set_value(self._legato, value, self.envelope)
+        
+    @property
+    def attackmod(self):
+        return get_value(self._attackmod, self.envelope)
+        
+    @attackmod.setter
+    def attackmod(self, value): 
+        set_value(self._attackmod, value, self.envelope)   
+        
+    @property
+    def attacktime(self):
+        return get_value(self._attacktime, self.envelope)
+        
+    @attacktime.setter
+    def attacktime(self, value): 
+        set_value(self._attacktime, value, self.envelope)
+        
+    @property
+    def decaytime(self):
+        return get_value(self._decaytime, self.envelope)
+        
+    @decaytime.setter
+    def decaytime(self, value): 
+        set_value(self._decaytime, value, self.envelope)
+    
+    @property
+    def ampmod(self):
+        return get_value(self._ampmod, self.envelope)
+        
+    @ampmod.setter
+    def ampmod(self, value): 
+        set_value(self._ampmod, value, self.envelope)   
+        
+    @property
+    def sustainlevel(self):
+        return get_value(self._sustainlevel, self.envelope)
+        
+    @sustainlevel.setter
+    def sustainlevel(self, value): 
+        set_value(self._sustainlevel, value, self.envelope)    
+        
+    @property
+    def sustaintime(self):
+        return get_value(self._sustaintime, self.envelope)
+        
+    @sustaintime.setter
+    def sustaintime(self, value): 
+        set_value(self._sustaintime, value, self.envelope)
+    
+    @property
+    def releasetime(self):
+        return get_value(self._releasetime, self.envelope)
+        
+    @releasetime.setter
+    def releasetime(self, value): 
+        set_value(self._releasetime, value, self.envelope)
+        
+        
