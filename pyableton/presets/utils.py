@@ -98,9 +98,9 @@ def set_value(parameter, value, parent):
     if parameter.type is 'bool':
         to_write = u'true' if value else u'false'
     elif parameter.type is 'int':
-        to_write = u'%d' % clamp(value)
+        to_write = u'%d' % clamp(value, parameter)
     elif parameter.type is 'float':
-        to_write = u'%f' % clamp(value)
+        to_write = u'%f' % clamp(value, parameter)
     elif parameter.type is 'enum':
         for key, val in parameter.dict.iteritems():
             if key == value.upper():

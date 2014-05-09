@@ -145,6 +145,7 @@ class Oscillator(object):
         self._modulation1 = Parameter(name='OscillatorModulation1', type='float', min=0.0, max=1.0)
         self._pulsewidth = Parameter(name='OscillatorPulseWidth', type='float', min=0.0, max=1.0)
         self._subamount = Parameter(name='OscillatorSubAmount', type='float', min=0.0, max=1.0)
+        self._balance = Parameter(name='OscillatorBalance', type='float', min=0.0, max=1.0)
         self._filterbalance = Parameter(name='OscillatorBalance', type='float', min=0.0, max=1.0)
         self._level = Parameter(name='OscillatorLevel', type='float', min=0.0, max=1.0)
         self._lfomodpitch = Parameter(name='OscillatorLFOModPitch', type='float', min=0.0, max=1.0)
@@ -197,7 +198,7 @@ class Oscillator(object):
     
     @mode.setter
     def mode(self, value):
-        set_value(self._mode, Oscillator.Modes[value])
+        set_value(self._mode, value, self.signalchain)
         
     @property
     def envtime(self):
@@ -238,6 +239,14 @@ class Oscillator(object):
     @subamount.setter
     def subamount(self, value):
         set_value(self._subamount, value, self.signalchain)
+    
+    @property
+    def balance(self):
+        return get_value(self._balance, self.signalchain)
+    
+    @balance.setter
+    def balance(self, value):
+        set_value(self._balance, value, self.signalchain)
     
     @property
     def filterbalance(self):
@@ -415,7 +424,7 @@ class Amp(object):
         self._pan = Parameter(name='AmplifierPan',type='float', min=0.0, max=1.0)
         self._kbdampmod = Parameter(name='AmplifierKbdAmpMod', type='float', min=-1.0, max=1.0)
         self._lfoampmod = Parameter(name='AmplifierLFOAmpMod', type='float', min=-1.0, max=1.0)
-        self._kbdpammod = Parameter(name='AmplifierKbdPanMod', type='float', min=-1.0, max=1.0)
+        self._kbdpanmod = Parameter(name='AmplifierKbdPanMod', type='float', min=-1.0, max=1.0)
         self._lfopanmod = Parameter(name='AmplifierLFOPanMod', type='float', min=-1.0, max=1.0)
         self._envpanmod = Parameter(name='AmplifierEnvPanMod', type='float', min=-1.0, max=1.0)
         
@@ -482,7 +491,7 @@ class Amp(object):
     
     @envpanmod.setter
     def envpanmod(self, value):
-        set_value(self._envpanmod, self.signalchain) 
+        set_value(self._envpanmod, value, self.signalchain) 
  
 class LFO(object):
     """
