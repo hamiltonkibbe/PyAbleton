@@ -244,9 +244,7 @@ def test_amp_envpanmod():
             ps.amp[i].envpanmod = val
             assert ps.amp[i].envpanmod == val             
             
-            
-def test_failing():
-    assert False
+
             
             
             
